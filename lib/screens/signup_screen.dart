@@ -1,6 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:smile_app/screens/confirmation_screen.dart';
-import 'package:smile_app/utils/constants.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -12,36 +13,65 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+
   final _formKey = GlobalKey<FormState>();
-  bool _rememberMe = false;
   bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
     _nameController.dispose();
     _phoneController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  void _signUp() {
+  Future<void> _signUp() async {
     if (_formKey.currentState!.validate()) {
-      // In a real app, this would register the user with a backend
-      // For now, we'll just navigate to a confirmation screen
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const ConfirmationScreen(),
-        ),
-      );
+      String email = _emailController.text.trim();
+      String password = _passwordController.text.trim();
+      String name = _nameController.text.trim();
+      String phoneNum = _phoneController.text.trim();
+
+      try {
+        UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+
+        User? user = userCredential.user;
+        if (user != null) {
+          await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+            'name': name,
+            'email': email,
+            'phonenum': phoneNum,
+          });
+        }
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const ConfirmationScreen(),
+          ),
+        );
+      } catch (e) {
+        print("Error during sign-up: $e");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Sign-up failed. Please try again.")),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.lightBlue.shade200,
+      backgroundColor: const Color(0xFFF99D4FF), // updated background color
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -49,7 +79,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(AppSizes.paddingL),
+          padding: const EdgeInsets.all(20),
           child: Form(
             key: _formKey,
             child: Column(
@@ -63,155 +93,84 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     color: Colors.black,
                   ),
                 ),
-                const SizedBox(height: AppSizes.paddingXL),
+                const SizedBox(height: 40),
 
-                // Name label
-                const Text(
-                  'Name',
-                  style: TextStyle(
-                    color: Colors.black87,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: AppSizes.paddingS),
-
-                // Name field
+                const Text('Name', style: TextStyle(fontWeight: FontWeight.w500)),
+                const SizedBox(height: 10),
                 TextFormField(
                   controller: _nameController,
-                  decoration: InputDecoration(
-                    hintText: 'Jon Dorman',
-                    filled: true,
-                    fillColor: Colors.lightBlue.shade100,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppSizes.radiusM),
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: AppSizes.paddingM,
-                      vertical: AppSizes.paddingM,
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your name';
-                    }
-                    if (value.length < 5) {
-                      return 'Name must be at least 5 characters';
-                    }
-                    return null;
-                  },
+                  decoration: _inputDecoration('John Doe'),
+                  validator: (value) => value == null || value.isEmpty ? 'Please enter your name' : null,
                 ),
-                const SizedBox(height: AppSizes.paddingL),
+                const SizedBox(height: 20),
 
-                // Phone Number label
-                const Text(
-                  'Phone Number',
-                  style: TextStyle(
-                    color: Colors.black87,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: AppSizes.paddingS),
-
-                // Phone field
+                const Text('Email', style: TextStyle(fontWeight: FontWeight.w500)),
+                const SizedBox(height: 10),
                 TextFormField(
-                  controller: _phoneController,
-                  decoration: InputDecoration(
-                    hintText: '+63 9',
-                    filled: true,
-                    fillColor: Colors.lightBlue.shade100,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppSizes.radiusM),
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: AppSizes.paddingM,
-                      vertical: AppSizes.paddingM,
-                    ),
-                  ),
-                  keyboardType: TextInputType.phone,
+                  controller: _emailController,
+                  decoration: _inputDecoration('john.doe@example.com'),
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your phone number';
-                    }
+                    if (value == null || value.isEmpty) return 'Please enter your email';
+                    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) return 'Enter a valid email';
                     return null;
                   },
                 ),
-                const SizedBox(height: AppSizes.paddingL),
+                const SizedBox(height: 20),
 
-                // Password label
-                const Text(
-                  'Password',
-                  style: TextStyle(
-                    color: Colors.black87,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: AppSizes.paddingS),
-
-                // Password field
+                const Text('Password', style: TextStyle(fontWeight: FontWeight.w500)),
+                const SizedBox(height: 10),
                 TextFormField(
                   controller: _passwordController,
-                  decoration: InputDecoration(
-                    hintText: '******',
-                    filled: true,
-                    fillColor: Colors.lightBlue.shade100,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppSizes.radiusM),
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: AppSizes.paddingM,
-                      vertical: AppSizes.paddingM,
-                    ),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                        color: Colors.grey,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
-                      },
-                    ),
-                  ),
                   obscureText: _obscurePassword,
+                  decoration: _passwordInputDecoration(
+                    hint: '******',
+                    toggleObscure: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
+                    obscure: _obscurePassword,
+                  ),
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a password';
-                    }
-                    if (value.length < 8) {
-                      return 'Password must be at least 8 characters';
-                    }
+                    if (value == null || value.isEmpty) return 'Please enter a password';
+                    if (value.length < 8) return 'Password must be at least 8 characters';
                     return null;
                   },
                 ),
+                const SizedBox(height: 20),
 
-                // Remember me checkbox
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Checkbox(
-                      value: _rememberMe,
-                      onChanged: (value) {
-                        setState(() {
-                          _rememberMe = value ?? false;
-                        });
-                      },
-                      activeColor: Colors.blue,
-                    ),
-                    const Text(
-                      'Remember Me',
-                      style: TextStyle(fontSize: 14),
-                    ),
-                  ],
+                const Text('Confirm Password', style: TextStyle(fontWeight: FontWeight.w500)),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: _confirmPasswordController,
+                  obscureText: _obscureConfirmPassword,
+                  decoration: _passwordInputDecoration(
+                    hint: 'Re-enter password',
+                    toggleObscure: () {
+                      setState(() {
+                        _obscureConfirmPassword = !_obscureConfirmPassword;
+                      });
+                    },
+                    obscure: _obscureConfirmPassword,
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) return 'Please confirm your password';
+                    if (value != _passwordController.text) return 'Passwords do not match';
+                    return null;
+                  },
                 ),
-                const SizedBox(height: AppSizes.paddingXL),
+                const SizedBox(height: 20),
 
-                // Continue button
+                const Text('Phone Number', style: TextStyle(fontWeight: FontWeight.w500)),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
+                  decoration: _inputDecoration('+63 9123456789'),
+                  validator: (value) => value == null || value.isEmpty ? 'Please enter your phone number' : null,
+                ),
+                const SizedBox(height: 40),
+
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -220,52 +179,43 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       backgroundColor: Colors.white,
                       foregroundColor: Colors.black,
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppSizes.radiusM),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
-                    child: const Text(
-                      'Continue',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                    child: const Text('Continue', style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
-                ),
-                const SizedBox(height: AppSizes.paddingXL),
-
-                // Already have an account link
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Already have an account?',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.black54,
-                      ),
-                    ),
-                    TextButton.icon(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      icon: const Text(
-                        'Log In',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                      label: const Icon(
-                        Icons.arrow_forward,
-                        size: 18,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ],
                 ),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  InputDecoration _inputDecoration(String hint) {
+    return InputDecoration(
+      hintText: hint,
+      filled: true,
+      fillColor: Colors.lightBlue.shade100,
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    );
+  }
+
+  InputDecoration _passwordInputDecoration({
+    required String hint,
+    required VoidCallback toggleObscure,
+    required bool obscure,
+  }) {
+    return InputDecoration(
+      hintText: hint,
+      filled: true,
+      fillColor: Colors.lightBlue.shade100,
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      suffixIcon: IconButton(
+        icon: Icon(obscure ? Icons.visibility_off : Icons.visibility, color: Colors.grey),
+        onPressed: toggleObscure,
       ),
     );
   }
