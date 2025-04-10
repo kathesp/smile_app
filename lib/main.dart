@@ -1,9 +1,30 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:smile_app/screens/splash_screen.dart';
 import 'package:smile_app/utils/constants.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  try {
+    // Initialize Firebase
+    if (kIsWeb) {
+      await Firebase.initializeApp(options: FirebaseOptions(
+          apiKey: "AIzaSyAk5F1RYDJKwKs9eb4oL-_Il3Aa3HXdxIU",
+          authDomain: "smile-f079e.firebaseapp.com",
+          projectId: "smile-f079e",
+          storageBucket: "smile-f079e.firebasestorage.app",
+          messagingSenderId: "615138744374",
+          appId: "1:615138744374:web:d92457c501566346ffe097"));
+    } else {
+      await Firebase.initializeApp();
+    }
+
+    runApp(const MyApp());
+  } catch (e) {
+    print("Firebase initialization failed: $e");
+  }
 }
 
 class MyApp extends StatelessWidget {
