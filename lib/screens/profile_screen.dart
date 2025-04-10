@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:smile_app/utils/constants.dart';
 import 'package:smile_app/screens/login_screen.dart';
@@ -5,8 +7,41 @@ import 'package:smile_app/screens/account_information_screen.dart';
 import 'package:smile_app/screens/payments_screen.dart';
 import 'package:smile_app/screens/address_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  _ProfileScreenState createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  // Create variables to store user data
+  String? _name;
+  String? _email;
+  String? _phoneNumber;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  // Fetch user data from Firestore
+  void _fetchUserData() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      setState(() {
+        _name = userDoc['name'];
+        _email = userDoc['email'];
+        _phoneNumber = userDoc['phonenum'].toString();
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,16 +82,23 @@ class ProfileScreen extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Hidethepain Harold',
-                        style: TextStyle(
+                      Text(
+                        _name ?? 'Loading...', // Display name or "Loading..." if not fetched yet
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
                           color: AppColors.textDark,
                         ),
                       ),
                       Text(
-                        'ID username',
+                        _email ?? 'Loading...', // Display email or "Loading..."
+                        style: AppTextStyles.bodyText2.copyWith(
+                          color: AppColors.textDark.withOpacity(0.7),
+                        ),
+                      ),
+                      const SizedBox(height: 8), // Space between email and phone
+                      Text(
+                        _phoneNumber ?? 'Loading...', // Display phone number or "Loading..."
                         style: AppTextStyles.bodyText2.copyWith(
                           color: AppColors.textDark.withOpacity(0.7),
                         ),
@@ -124,7 +166,7 @@ class ProfileScreen extends StatelessWidget {
             // Logout button
             Padding(
               padding:
-                  const EdgeInsets.symmetric(horizontal: AppSizes.paddingL),
+              const EdgeInsets.symmetric(horizontal: AppSizes.paddingL),
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -186,7 +228,7 @@ class ProfileScreen extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) => const LoginScreen(),
                 ),
-                (route) => false, // Remove all previous routes
+                    (route) => false, // Remove all previous routes
               );
             },
             child: const Text('Logout'),
