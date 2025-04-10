@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:smile_app/utils/constants.dart';
 
 class AddressScreen extends StatefulWidget {
@@ -10,22 +12,45 @@ class AddressScreen extends StatefulWidget {
 
 class _AddressScreenState extends State<AddressScreen> {
   final TextEditingController _searchController = TextEditingController();
-  final String _currentAddress = '9185 Mayflower Drive Atlanta';
+  String _currentAddress = '';
+  final _auth = FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAddress();
+  }
+
+  Future<void> _fetchAddress() async {
+    final uid = _auth.currentUser?.uid;
+    if (uid != null) {
+      final doc = await _firestore.collection('users').doc(uid).get();
+      setState(() {
+        _currentAddress = doc.data()?['address'] ?? 'No address set';
+      });
+    }
+  }
+
+  Future<void> _addNewAddress(String newAddress) async {
+    final uid = _auth.currentUser?.uid;
+    if (uid != null) {
+      await _firestore.collection('users').doc(uid).update({
+        'address': newAddress,
+      });
+      setState(() {
+        _currentAddress = newAddress;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Address updated successfully!')),
+      );
+    }
+  }
 
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
-  }
-
-  void _addNewAddress() {
-    // In a real app, this would open a form to add a new address
-    // For now, we'll just show a snackbar
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Add address functionality coming soon!'),
-      ),
-    );
   }
 
   @override
@@ -48,7 +73,6 @@ class _AddressScreenState extends State<AddressScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Search Field
             TextField(
               controller: _searchController,
               decoration: InputDecoration(
@@ -63,20 +87,19 @@ class _AddressScreenState extends State<AddressScreen> {
               ),
               onSubmitted: (value) {
                 if (value.isNotEmpty) {
-                  _addNewAddress();
+                  _addNewAddress(value);
+                  _searchController.clear();
                 }
               },
             ),
             const SizedBox(height: AppSizes.paddingL),
 
-            // Current Address Title
             const Text(
               'Current Address:',
               style: AppTextStyles.headline3,
             ),
             const SizedBox(height: AppSizes.paddingM),
 
-            // Current Address Card
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(AppSizes.paddingL),
@@ -100,9 +123,11 @@ class _AddressScreenState extends State<AddressScreen> {
                     size: 30,
                   ),
                   const SizedBox(width: AppSizes.paddingM),
-                  Text(
-                    _currentAddress,
-                    style: AppTextStyles.bodyText1,
+                  Expanded(
+                    child: Text(
+                      _currentAddress,
+                      style: AppTextStyles.bodyText1,
+                    ),
                   ),
                 ],
               ),
