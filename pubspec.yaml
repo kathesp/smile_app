@@ -36,8 +36,6 @@ dependencies:
   cupertino_icons: ^1.0.2
   smooth_page_indicator: ^1.1.0
   shared_preferences: ^2.2.2
-  provider: ^6.0.5
-  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:
@@ -75,11 +73,6 @@ flutter:
     - assets/medical-support-icon.png
     - assets/order-icon.png
     - assets/ad-bg.jpg
-    - assets/low_sodium/
-    - assets/high_protein/
-    - assets/diabetic_friendly/
-    - assets/lactose_free/
-    - assets/menu_list.txt
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

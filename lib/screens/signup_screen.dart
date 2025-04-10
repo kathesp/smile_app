@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:smile_app/screens/signup_confirmation_screen.dart';
+import 'package:smile_app/screens/confirmation_screen.dart';
 import 'package:smile_app/utils/constants.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -32,7 +32,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => const SignupConfirmationScreen(),
+          builder: (context) => const ConfirmationScreen(),
         ),
       );
     }

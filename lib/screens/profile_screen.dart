@@ -4,274 +4,194 @@ import 'package:smile_app/screens/login_screen.dart';
 import 'package:smile_app/screens/account_information_screen.dart';
 import 'package:smile_app/screens/payments_screen.dart';
 import 'package:smile_app/screens/address_screen.dart';
-import 'order_screen.dart';
 
-class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
-
-  @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
-}
-
-class _ProfileScreenState extends State<ProfileScreen> {
-  int _currentIndex = 2; // Set to 2 for Profile tab
+class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
+      appBar: AppBar(
+        backgroundColor: AppColors.primary,
+        elevation: 0,
+        title: const Text(
+          'Profile',
+          style: TextStyle(
+            color: AppColors.textDark,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        iconTheme: const IconThemeData(color: AppColors.textDark),
+      ),
+      body: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Yellow header
+            // Profile header
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              color: const Color(0xFFFEEB50), // Yellow header color
+              padding: const EdgeInsets.all(AppSizes.paddingL),
+              color: AppColors.primary,
               child: Row(
                 children: [
-                  // Back button
-                  GestureDetector(
-                    onTap: () => Navigator.of(context).pop(),
-                    child: const Icon(Icons.arrow_back, color: Colors.black),
-                  ),
-                  const Spacer(),
-
-                  // Title
-                  const Text(
-                    'Profile',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                  // Profile image
+                  CircleAvatar(
+                    radius: 40,
+                    backgroundColor: Colors.white,
+                    child: Image.asset(
+                      'assets/LOGO.png',
+                      width: 40,
+                      height: 40,
                     ),
                   ),
-
-                  const Spacer(),
-
-                  // Settings icon
-                  IconButton(
-                    icon: const Icon(Icons.settings, color: Colors.black),
-                    onPressed: () {
-                      // Navigate to settings
-                    },
+                  const SizedBox(width: AppSizes.paddingL),
+                  // User info
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Hidethepain Harold',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: AppColors.textDark,
+                        ),
+                      ),
+                      Text(
+                        'ID username',
+                        style: AppTextStyles.bodyText2.copyWith(
+                          color: AppColors.textDark.withOpacity(0.7),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
 
-            // Profile content
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    // Profile Avatar
-                    const SizedBox(height: 20),
-                    Center(
-                      child: Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.grey.shade300,
-                        ),
-                        child: const Icon(
-                          Icons.person,
-                          color: Colors.white,
-                          size: 60,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+            // Profile options
+            const SizedBox(height: AppSizes.paddingL),
 
-                    // User name
-                    const Text(
-                      'Juan Dela Cruz',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 22,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'juan.delacruz@example.com',
-                      style: TextStyle(
-                        color: Colors.grey.shade700,
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: 32),
+            // Account Information
+            _buildProfileOption(
+              context: context,
+              icon: Icons.person,
+              title: 'Account Information',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AccountInformationScreen(),
+                  ),
+                );
+              },
+            ),
 
-                    // Profile sections
-                    _buildProfileSection('My Orders', Icons.shopping_bag),
-                    _buildProfileSection('My Addresses', Icons.location_on),
-                    _buildProfileSection('Payment Methods', Icons.payment),
-                    _buildProfileSection('Notifications', Icons.notifications),
-                    _buildProfileSection('Help Center', Icons.help),
-                    _buildProfileSection('About Us', Icons.info),
+            const Divider(height: 1),
 
-                    // Logout button
-                    const SizedBox(height: 32),
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: () {
-                          // Show confirmation dialog
-                          showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: const Text('Logout'),
-                              content: const Text(
-                                  'Are you sure you want to logout?'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: const Text('Cancel'),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    // Navigate to login screen
-                                    Navigator.pushNamedAndRemoveUntil(
-                                      context,
-                                      '/login',
-                                      (route) => false,
-                                    );
-                                  },
-                                  child: const Text('Logout'),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.logout, color: Colors.red),
-                        label: const Text(
-                          'Logout',
-                          style: TextStyle(color: Colors.red),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          side: const BorderSide(color: Colors.red),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                  ],
+            // Payments
+            _buildProfileOption(
+              context: context,
+              icon: Icons.payment,
+              title: 'Payments',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const PaymentsScreen(),
+                  ),
+                );
+              },
+            ),
+
+            const Divider(height: 1),
+
+            // Address
+            _buildProfileOption(
+              context: context,
+              icon: Icons.location_on,
+              title: 'Address',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AddressScreen(),
+                  ),
+                );
+              },
+            ),
+
+            const SizedBox(height: AppSizes.paddingXL),
+
+            // Logout button
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: AppSizes.paddingL),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    _showLogoutConfirmation(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red.shade100,
+                    foregroundColor: Colors.red,
+                  ),
+                  child: const Text('Logout'),
                 ),
               ),
             ),
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-
-          if (index == 0) {
-            // Pop back to home
-            Navigator.of(context).popUntil((route) => route.isFirst);
-          } else if (index == 1) {
-            // Navigate to order screen
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const OrderScreen()),
-            );
-          }
-        },
-        selectedItemColor: const Color(0xFFFEEB50), // Yellow selected icon
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.history),
-            label: 'Orders',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-      ),
     );
   }
 
-  Widget _buildProfileSection(String title, IconData icon) {
-    return InkWell(
-      onTap: () {
-        switch (title) {
-          case 'My Orders':
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const OrderScreen()),
-            );
-            break;
-          case 'My Addresses':
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const AddressScreen()),
-            );
-            break;
-          case 'Payment Methods':
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const PaymentsScreen()),
-            );
-            break;
-          case 'Account Information':
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => const AccountInformationScreen()),
-            );
-            break;
-          // For other sections, you can add appropriate navigation or actions
-          default:
-            // Show a "coming soon" message for unimplemented sections
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('$title coming soon!')),
-            );
-        }
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: Colors.grey.shade200,
-              width: 1,
-            ),
+  Widget _buildProfileOption({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      leading: Icon(icon, color: AppColors.textDark),
+      title: Text(
+        title,
+        style: AppTextStyles.bodyText1,
+      ),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: onTap,
+    );
+  }
+
+  void _showLogoutConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // Close dialog
+            },
+            child: const Text('Cancel'),
           ),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              color: Colors.black87,
-              size: 22,
-            ),
-            const SizedBox(width: 12),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const Spacer(),
-            const Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.black54,
-              size: 16,
-            ),
-          ],
-        ),
+          TextButton(
+            onPressed: () {
+              // Close dialog
+              Navigator.pop(context);
+
+              // Navigate to login screen
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const LoginScreen(),
+                ),
+                (route) => false, // Remove all previous routes
+              );
+            },
+            child: const Text('Logout'),
+          ),
+        ],
       ),
     );
   }
