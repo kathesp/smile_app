@@ -6,42 +6,56 @@ import 'food_detail_screen.dart';
 import 'cart_screen.dart';
 import 'profile_screen.dart';
 import 'order_screen.dart';
+import '../services/menu_service.dart';
+import 'dietary_screen.dart';
 
-class LowSodiumScreen extends StatefulWidget {
-  const LowSodiumScreen({Key? key}) : super(key: key);
+class LowSodiumScreen extends DietaryScreen {
+  const LowSodiumScreen({super.key}) : super(categoryName: 'Low Sodium');
 
   @override
   State<LowSodiumScreen> createState() => _LowSodiumScreenState();
 }
 
 class _LowSodiumScreenState extends State<LowSodiumScreen> {
+  late String _selectedCategory;
   final TextEditingController _searchController = TextEditingController();
-  String _selectedCategory = 'Morning Offer';
-  int _currentIndex = 1; // Set to 1 for Orders tab
-  final List<String> _categories = [
-    'Morning Offer',
-    'Lunch Offer',
-    'Dinner Offer',
-    'Drinks',
-    'Additional',
-  ];
+  int _currentIndex = 1;
 
-  // Get low sodium items filtered by category
-  List<FoodItem> _getFilteredItems() {
-    final lowSodiumItems = getLowSodiumItems();
-    if (_selectedCategory.isEmpty) {
-      return lowSodiumItems;
-    }
-    return lowSodiumItems
-        .where((item) => item.category == _selectedCategory)
-        .toList();
+  List<String> get categories =>
+      MenuService.getSubcategories(widget.categoryName);
+
+  Color get headerColor => const Color(0xFFFEEB50);
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedCategory = MenuService.getSubcategories(widget.categoryName).first;
   }
+
+  List<FoodItem> get filteredItems =>
+      MenuService.getItems(widget.categoryName, _selectedCategory)
+          .map((item) => FoodItem(
+                id: '${widget.categoryName.toLowerCase()}_${item['name'].toLowerCase().replaceAll(' ', '_')}',
+                name: item['name'],
+                description: item['description'],
+                price: item['price'],
+                category: _selectedCategory,
+                image:
+                    'assets/${widget.categoryName.toLowerCase()}/${_selectedCategory.toLowerCase().replaceAll(' ', '_')}.png',
+                isLowSodium: widget.categoryName == 'Low Sodium',
+                isHighProtein: widget.categoryName == 'High Protein',
+                isDiabeticFriendly: widget.categoryName == 'Diabetic Friendly',
+                isLactoseFree: widget.categoryName == 'Lactose Free',
+                allergies: item['allergies'] != null
+                    ? List<String>.from(item['allergies'])
+                    : const [],
+              ))
+          .toList();
 
   @override
   Widget build(BuildContext context) {
     final cartService = Provider.of<CartService>(context);
     final cartItemCount = cartService.itemCount;
-    final filteredItems = _getFilteredItems();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -51,7 +65,7 @@ class _LowSodiumScreenState extends State<LowSodiumScreen> {
             // Yellow header with back, title and cart
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              color: const Color(0xFFFEEB50), // Yellow header color
+              color: headerColor, // Yellow header color
               child: Column(
                 children: [
                   Row(
@@ -152,7 +166,7 @@ class _LowSodiumScreenState extends State<LowSodiumScreen> {
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
-                  children: _categories
+                  children: categories
                       .map(
                         (category) => Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -167,7 +181,7 @@ class _LowSodiumScreenState extends State<LowSodiumScreen> {
                               }
                             },
                             backgroundColor: Colors.grey.shade200,
-                            selectedColor: const Color(0xFFFEEB50),
+                            selectedColor: headerColor,
                             labelStyle: TextStyle(
                               color: _selectedCategory == category
                                   ? Colors.black
@@ -217,20 +231,17 @@ class _LowSodiumScreenState extends State<LowSodiumScreen> {
           });
 
           if (index == 0) {
-            // Pop back to home
-            Navigator.of(context).popUntil((route) => route.isFirst);
+            // Navigate to home
+            Navigator.pushReplacementNamed(context, '/home');
           } else if (index == 1 && Navigator.of(context).canPop()) {
             // Go back to order screen
-            Navigator.of(context).pop();
+            Navigator.pushReplacementNamed(context, '/order');
           } else if (index == 2) {
             // Navigate to profile screen
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const ProfileScreen()),
-            );
+            Navigator.pushReplacementNamed(context, '/profile');
           }
         },
-        selectedItemColor: const Color(0xFFFEEB50), // Yellow selected icon
+        selectedItemColor: headerColor, // Yellow selected icon
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),

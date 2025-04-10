@@ -20,6 +20,7 @@ class FoodDetailScreen extends StatefulWidget {
 
 class _FoodDetailScreenState extends State<FoodDetailScreen> {
   int _currentIndex = 1; // Set to 1 for Orders tab
+  int _quantity = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -118,18 +119,11 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                           children: [
                             Text(
                               widget.foodItem.name,
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: Theme.of(context).textTheme.headlineSmall,
                             ),
                             Text(
-                              '₱${widget.foodItem.price.toStringAsFixed(0)}',
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black87,
-                              ),
+                              '₱${widget.foodItem.price.toStringAsFixed(2)}',
+                              style: Theme.of(context).textTheme.titleLarge,
                             ),
                           ],
                         ),
@@ -139,10 +133,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                         // Description
                         Text(
                           widget.foodItem.description,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey.shade700,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium,
                         ),
 
                         const SizedBox(height: 16),
@@ -209,11 +200,11 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                         ),
                         const SizedBox(height: 8),
 
-                        _buildNutritionRow('Calories', '120 kcal'),
-                        _buildNutritionRow('Protein', '5g'),
-                        _buildNutritionRow('Carbohydrates', '22g'),
-                        _buildNutritionRow('Fat', '3g'),
-                        _buildNutritionRow('Sodium', '<12mg'),
+                        _buildNutritionInfo(),
+
+                        const SizedBox(height: 24),
+
+                        _buildQuantitySelector(),
 
                         const SizedBox(height: 80), // Space for bottom button
                       ],
@@ -240,43 +231,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                     ),
                   ],
                 ),
-                child: ElevatedButton(
-                  onPressed: () {
-                    cartService.addItem(widget.foodItem);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('${widget.foodItem.name} added to cart'),
-                        duration: const Duration(seconds: 1),
-                        action: SnackBarAction(
-                          label: 'VIEW CART',
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const CartScreen(),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                  child: const Text(
-                    'Add to Cart',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+                child: _buildAddToCartButton(context),
               ),
             ),
           ],
@@ -331,26 +286,84 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
     );
   }
 
-  Widget _buildNutritionRow(String nutrient, String value) {
+  Widget _buildNutritionInfo() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Nutritional Information',
+            style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: 8),
+        const NutritionRow(label: 'Calories', value: '250 kcal'),
+        const NutritionRow(label: 'Protein', value: '20g'),
+        const NutritionRow(label: 'Carbs', value: '35g'),
+        const NutritionRow(label: 'Fat', value: '8g'),
+      ],
+    );
+  }
+
+  Widget _buildQuantitySelector() {
+    return Row(
+      children: [
+        Text('Quantity:', style: Theme.of(context).textTheme.titleMedium),
+        const Spacer(),
+        IconButton(
+          icon: const Icon(Icons.remove),
+          onPressed: () =>
+              setState(() => _quantity = _quantity > 1 ? _quantity - 1 : 1),
+        ),
+        Text('$_quantity', style: Theme.of(context).textTheme.titleMedium),
+        IconButton(
+          icon: const Icon(Icons.add),
+          onPressed: () => setState(() => _quantity++),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAddToCartButton(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFFFEEB50),
+          padding: const EdgeInsets.symmetric(vertical: 16),
+        ),
+        onPressed: () {
+          final cartService = Provider.of<CartService>(context, listen: false);
+          final itemToAdd = widget.foodItem.copyWith(quantity: _quantity);
+          cartService.addItem(itemToAdd);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Added $_quantity ${widget.foodItem.name} to cart'),
+              action: SnackBarAction(
+                label: 'VIEW CART',
+                onPressed: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const CartScreen())),
+              ),
+            ),
+          );
+        },
+        child: const Text('ADD TO CART', style: TextStyle(color: Colors.black)),
+      ),
+    );
+  }
+}
+
+class NutritionRow extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const NutritionRow({super.key, required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            nutrient,
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey.shade700,
-            ),
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+          Text(label, style: const TextStyle(color: Colors.grey)),
+          const Spacer(),
+          Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
         ],
       ),
     );

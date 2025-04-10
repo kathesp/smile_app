@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../models/food_item.dart';
 import '../models/order.dart';
 import '../services/cart_service.dart';
-import 'profile_screen.dart';
 import 'low_sodium_screen.dart';
 import 'high_protein_screen.dart';
 import 'diabetic_friendly_screen.dart';
@@ -11,6 +10,7 @@ import 'lactose_free_screen.dart';
 import 'order_history_screen.dart';
 import 'track_order_screen.dart';
 import 'cart_screen.dart';
+import 'profile_screen.dart';
 
 class OrderScreen extends StatefulWidget {
   const OrderScreen({Key? key}) : super(key: key);
@@ -174,7 +174,7 @@ class _OrderScreenState extends State<OrderScreen> {
                             () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const HighProteinScreen(),
+                                builder: (context) => HighProteinScreen(),
                               ),
                             ),
                           ),

@@ -5,6 +5,7 @@ import '../models/order.dart';
 import '../services/cart_service.dart';
 import 'profile_screen.dart';
 import 'order_screen.dart';
+import 'confirmation_screen.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({Key? key}) : super(key: key);
@@ -249,25 +250,15 @@ class _CartScreenState extends State<CartScreen> {
                       child: ElevatedButton(
                         onPressed: () {
                           final order = cartService.createOrder();
-                          // Here you would typically process the order
-                          // For now, let's just show a confirmation dialog
-                          showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: const Text('Order Placed!'),
-                              content: Text(
-                                  'Your order #${order.id} has been placed.'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    cartService.clear();
-                                    Navigator.of(context).pop();
-                                    Navigator.pop(
-                                        context); // Return to previous screen
-                                  },
-                                  child: const Text('OK'),
-                                ),
-                              ],
+                          // Navigate to confirmation screen
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ConfirmationScreen(
+                                order: order,
+                                address:
+                                    "123 Main St., Barangay San Antonio, Quezon City, Metro Manila", // Default address
+                              ),
                             ),
                           );
                         },

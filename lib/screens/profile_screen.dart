@@ -118,7 +118,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       width: double.infinity,
                       child: OutlinedButton.icon(
                         onPressed: () {
-                          // Handle logout
+                          // Show confirmation dialog
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Logout'),
+                              content: const Text(
+                                  'Are you sure you want to logout?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    // Navigate to login screen
+                                    Navigator.pushNamedAndRemoveUntil(
+                                      context,
+                                      '/login',
+                                      (route) => false,
+                                    );
+                                  },
+                                  child: const Text('Logout'),
+                                ),
+                              ],
+                            ),
+                          );
                         },
                         icon: const Icon(Icons.logout, color: Colors.red),
                         label: const Text(
@@ -179,7 +205,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildProfileSection(String title, IconData icon) {
     return InkWell(
       onTap: () {
-        // Handle section tap
+        switch (title) {
+          case 'My Orders':
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const OrderScreen()),
+            );
+            break;
+          case 'My Addresses':
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AddressScreen()),
+            );
+            break;
+          case 'Payment Methods':
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const PaymentsScreen()),
+            );
+            break;
+          case 'Account Information':
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const AccountInformationScreen()),
+            );
+            break;
+          // For other sections, you can add appropriate navigation or actions
+          default:
+            // Show a "coming soon" message for unimplemented sections
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('$title coming soon!')),
+            );
+        }
       },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16),

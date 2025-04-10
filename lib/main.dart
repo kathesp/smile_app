@@ -5,6 +5,13 @@ import 'package:smile_app/utils/constants.dart';
 import 'package:smile_app/services/cart_service.dart';
 import 'package:smile_app/screens/home_screen.dart';
 import 'package:smile_app/screens/order_screen.dart';
+import 'package:smile_app/screens/login_screen.dart';
+import 'package:smile_app/screens/welcome_screen.dart';
+import 'package:smile_app/screens/profile_screen.dart';
+import 'package:smile_app/screens/confirmation_screen.dart';
+import 'package:smile_app/screens/cart_screen.dart';
+import 'package:smile_app/screens/signup_screen.dart';
+import 'package:smile_app/screens/signup_confirmation_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -99,6 +106,12 @@ class MyApp extends StatelessWidget {
         routes: {
           '/home': (context) => const HomeScreen(),
           '/order': (context) => const OrderScreen(),
+          '/profile': (context) => const ProfileScreen(),
+          '/cart': (context) => const CartScreen(),
+          '/login': (context) => const LoginScreen(),
+          '/welcome': (context) => const WelcomeScreen(),
+          '/signup': (context) => const SignUpScreen(),
+          '/signup_confirmation': (context) => const SignupConfirmationScreen(),
         },
       ),
     );
