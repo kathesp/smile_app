@@ -1,0 +1,2 @@
+C:/ojt/smile_app/android/app/.cxx/Debug/b1e384ua/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/ojt/smile_app/android/app/.cxx/Debug/b1e384ua/arm64-v8a/CMakeFiles/rebuild_cache.dir

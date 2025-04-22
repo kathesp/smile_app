@@ -14,56 +14,68 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _rememberMe = false;
   bool _obscurePassword = true;
+  bool _isLoading = false;
 
   @override
   void dispose() {
-    _phoneController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
-  void _login() async {
+  Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
-      String input = _phoneController.text.trim();
-      String password = _passwordController.text.trim();
+      setState(() {
+        _isLoading = true;
+      });
 
       try {
-        String email = input;
+        // Attempt to sign in with email and password
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
 
-        if (!input.contains('@')) {
-          final snapshot = await FirebaseFirestore.instance
-              .collection('users')
-              .where('phonenum', isEqualTo: input)
-              .get();
-
-          if (snapshot.docs.isEmpty) {
-            throw FirebaseAuthException(
-              code: 'user-not-found',
-              message: 'Phone number not found.',
-            );
-          }
-
-          email = snapshot.docs.first['email'];
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
+          );
+        }
+      } on FirebaseAuthException catch (e) {
+        String errorMessage = 'An error occurred during login';
+        if (e.code == 'user-not-found') {
+          errorMessage = 'No user found for that email';
+        } else if (e.code == 'wrong-password') {
+          errorMessage = 'Wrong password provided';
+        } else if (e.code == 'invalid-email') {
+          errorMessage = 'Please provide a valid email address';
+        } else if (e.code == 'user-disabled') {
+          errorMessage = 'This account has been disabled';
         }
 
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-        );
-      } on FirebaseAuthException catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message ?? 'Login failed')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(errorMessage)),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: $e')),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     }
   }
@@ -102,41 +114,37 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: AppSizes.paddingXL),
-
                 const Text(
-                  'Email or Phone Number',
+                  'Email',
                   style: TextStyle(
                     color: Colors.black87,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: AppSizes.paddingS),
-
                 TextFormField(
-                  controller: _phoneController,
+                  controller: _emailController,
                   decoration: InputDecoration(
-                    hintText: 'Enter email or phone number',
+                    hintText: 'Enter your email',
                     filled: true,
                     fillColor: Colors.lightBlue.shade100,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppSizes.radiusM),
                       borderSide: BorderSide.none,
                     ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: AppSizes.paddingM,
-                      vertical: AppSizes.paddingM,
-                    ),
                   ),
-                  keyboardType: TextInputType.text,
+                  keyboardType: TextInputType.emailAddress,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your email or phone number';
+                      return 'Please enter your email';
+                    }
+                    if (!value.contains('@')) {
+                      return 'Please enter a valid email';
                     }
                     return null;
                   },
                 ),
                 const SizedBox(height: AppSizes.paddingL),
-
                 const Text(
                   'Password',
                   style: TextStyle(
@@ -145,24 +153,21 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: AppSizes.paddingS),
-
                 TextFormField(
                   controller: _passwordController,
                   decoration: InputDecoration(
-                    hintText: '********',
+                    hintText: '••••••••',
                     filled: true,
                     fillColor: Colors.lightBlue.shade100,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppSizes.radiusM),
                       borderSide: BorderSide.none,
                     ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: AppSizes.paddingM,
-                      vertical: AppSizes.paddingM,
-                    ),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                        _obscurePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
                         color: Colors.grey,
                       ),
                       onPressed: () {
@@ -180,7 +185,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     return null;
                   },
                 ),
-
                 Align(
                   alignment: Alignment.centerRight,
                   child: Row(
@@ -203,11 +207,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: AppSizes.paddingXL),
-
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: _login,
+                    onPressed: _isLoading ? null : _login,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       foregroundColor: Colors.black,
@@ -216,10 +219,18 @@ class _LoginScreenState extends State<LoginScreen> {
                         borderRadius: BorderRadius.circular(AppSizes.radiusM),
                       ),
                     ),
-                    child: const Text(
-                      'Submit',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Text(
+                            'Submit',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                   ),
                 ),
               ],

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:smile_app/screens/confirmation_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:smile_app/screens/signup_confirmation_screen.dart';
 import 'package:smile_app/utils/constants.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -13,28 +15,79 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _rememberMe = false;
   bool _obscurePassword = true;
+  bool _isLoading = false;
 
   @override
   void dispose() {
     _nameController.dispose();
     _phoneController.dispose();
     _passwordController.dispose();
+    _emailController.dispose();
     super.dispose();
   }
 
-  void _signUp() {
+  Future<void> _signUp() async {
     if (_formKey.currentState!.validate()) {
-      // In a real app, this would register the user with a backend
-      // For now, we'll just navigate to a confirmation screen
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const ConfirmationScreen(),
-        ),
-      );
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        // Create user with email and password in Firebase Auth
+        final UserCredential userCredential =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+
+        // Store additional user data in Firestore
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userCredential.user!.uid)
+            .set({
+          'name': _nameController.text.trim(),
+          'email': _emailController.text.trim(),
+          'phonenum': _phoneController.text.trim(),
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+
+        // Navigate to confirmation screen
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const SignupConfirmationScreen(),
+            ),
+          );
+        }
+      } on FirebaseAuthException catch (e) {
+        // Handle specific Firebase Auth errors
+        String errorMessage = 'An error occurred during signup';
+        if (e.code == 'weak-password') {
+          errorMessage = 'The password provided is too weak';
+        } else if (e.code == 'email-already-in-use') {
+          errorMessage = 'An account already exists for that email';
+        } else if (e.code == 'invalid-email') {
+          errorMessage = 'Please provide a valid email address';
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorMessage)),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
     }
   }
 
@@ -65,7 +118,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
                 const SizedBox(height: AppSizes.paddingXL),
 
-                // Name label
+                // Name field
                 const Text(
                   'Name',
                   style: TextStyle(
@@ -74,36 +127,60 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ),
                 const SizedBox(height: AppSizes.paddingS),
-
-                // Name field
                 TextFormField(
                   controller: _nameController,
                   decoration: InputDecoration(
-                    hintText: 'Jon Dorman',
+                    hintText: 'Full Name',
                     filled: true,
                     fillColor: Colors.lightBlue.shade100,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppSizes.radiusM),
                       borderSide: BorderSide.none,
                     ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: AppSizes.paddingM,
-                      vertical: AppSizes.paddingM,
-                    ),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your name';
-                    }
-                    if (value.length < 5) {
-                      return 'Name must be at least 5 characters';
                     }
                     return null;
                   },
                 ),
                 const SizedBox(height: AppSizes.paddingL),
 
-                // Phone Number label
+                // Email field
+                const Text(
+                  'Email',
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: AppSizes.paddingS),
+                TextFormField(
+                  controller: _emailController,
+                  decoration: InputDecoration(
+                    hintText: 'email@example.com',
+                    filled: true,
+                    fillColor: Colors.lightBlue.shade100,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(AppSizes.radiusM),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your email';
+                    }
+                    if (!value.contains('@')) {
+                      return 'Please enter a valid email';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: AppSizes.paddingL),
+
+                // Phone Number field
                 const Text(
                   'Phone Number',
                   style: TextStyle(
@@ -112,8 +189,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ),
                 const SizedBox(height: AppSizes.paddingS),
-
-                // Phone field
                 TextFormField(
                   controller: _phoneController,
                   decoration: InputDecoration(
@@ -123,10 +198,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppSizes.radiusM),
                       borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: AppSizes.paddingM,
-                      vertical: AppSizes.paddingM,
                     ),
                   ),
                   keyboardType: TextInputType.phone,
@@ -139,7 +210,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
                 const SizedBox(height: AppSizes.paddingL),
 
-                // Password label
+                // Password field
                 const Text(
                   'Password',
                   style: TextStyle(
@@ -148,21 +219,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ),
                 const SizedBox(height: AppSizes.paddingS),
-
-                // Password field
                 TextFormField(
                   controller: _passwordController,
                   decoration: InputDecoration(
-                    hintText: '******',
+                    hintText: '••••••••',
                     filled: true,
                     fillColor: Colors.lightBlue.shade100,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppSizes.radiusM),
                       borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: AppSizes.paddingM,
-                      vertical: AppSizes.paddingM,
                     ),
                     suffixIcon: IconButton(
                       icon: Icon(
@@ -183,8 +248,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter a password';
                     }
-                    if (value.length < 8) {
-                      return 'Password must be at least 8 characters';
+                    if (value.length < 6) {
+                      return 'Password must be at least 6 characters';
                     }
                     return null;
                   },
@@ -211,11 +276,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
                 const SizedBox(height: AppSizes.paddingXL),
 
-                // Continue button
+                // Sign up button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: _signUp,
+                    onPressed: _isLoading ? null : _signUp,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       foregroundColor: Colors.black,
@@ -224,15 +289,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         borderRadius: BorderRadius.circular(AppSizes.radiusM),
                       ),
                     ),
-                    child: const Text(
-                      'Continue',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Text(
+                            'Continue',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                   ),
                 ),
                 const SizedBox(height: AppSizes.paddingXL),
 
-                // Already have an account link
+                // Login link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

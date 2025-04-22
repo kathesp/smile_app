@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/order.dart';
 import '../services/cart_service.dart';
 import 'package:provider/provider.dart';
+import 'order_screen.dart'; // Import order screen
 
 class ConfirmationScreen extends StatelessWidget {
   final String address;
@@ -217,6 +218,8 @@ class ConfirmationScreen extends StatelessWidget {
                   // Here you would typically process the order
                   showDialog(
                     context: context,
+                    barrierDismissible:
+                        false, // Prevent dismissing by tapping outside
                     builder: (context) => AlertDialog(
                       title: const Text('Order Placed!'),
                       content: Text(
@@ -224,13 +227,16 @@ class ConfirmationScreen extends StatelessWidget {
                       actions: [
                         TextButton(
                           onPressed: () {
-                            cartService.clear();
+                            cartService.clear(); // Clear the cart
                             Navigator.of(context).pop(); // Close the dialog
-                            // Navigate to order screen
-                            Navigator.pushNamedAndRemoveUntil(
+
+                            // Navigate to the order screen and remove all previous screens
+                            Navigator.pushAndRemoveUntil(
                               context,
-                              '/order',
-                              (route) => false,
+                              MaterialPageRoute(
+                                builder: (context) => const OrderScreen(),
+                              ),
+                              (route) => false, // Remove all previous routes
                             );
                           },
                           child: const Text('OK'),
