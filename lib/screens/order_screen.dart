@@ -44,8 +44,10 @@ class _OrderScreenState extends State<OrderScreen> {
                       // Back button
                       GestureDetector(
                         onTap: () => Navigator.of(context).pop(),
-                        child:
-                            const Icon(Icons.arrow_back, color: Colors.black),
+                        child: const Icon(
+                          Icons.arrow_back,
+                          color: Colors.black,
+                        ),
                       ),
                       const Spacer(),
 
@@ -66,8 +68,10 @@ class _OrderScreenState extends State<OrderScreen> {
                         clipBehavior: Clip.none,
                         children: [
                           IconButton(
-                            icon: const Icon(Icons.shopping_cart,
-                                color: Colors.black),
+                            icon: const Icon(
+                              Icons.shopping_cart,
+                              color: Colors.black,
+                            ),
                             onPressed: () {
                               Navigator.push(
                                 context,
@@ -116,14 +120,23 @@ class _OrderScreenState extends State<OrderScreen> {
                       decoration: InputDecoration(
                         hintText: 'Search for food',
                         hintStyle: TextStyle(
-                            color: Colors.grey.shade500, fontSize: 14),
-                        prefixIcon: const Icon(Icons.search,
-                            size: 20, color: Colors.grey),
-                        suffixIcon: const Icon(Icons.tune,
-                            size: 20, color: Colors.grey),
+                          color: Colors.grey.shade500,
+                          fontSize: 14,
+                        ),
+                        prefixIcon: const Icon(
+                          Icons.search,
+                          size: 20,
+                          color: Colors.grey,
+                        ),
+                        suffixIcon: const Icon(
+                          Icons.tune,
+                          size: 20,
+                          color: Colors.grey,
+                        ),
                         border: InputBorder.none,
-                        contentPadding:
-                            const EdgeInsets.symmetric(vertical: 10),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 10,
+                        ),
                       ),
                     ),
                   ),
@@ -160,7 +173,7 @@ class _OrderScreenState extends State<OrderScreen> {
                         children: [
                           _buildCategoryCard(
                             'Low Sodium',
-                            'assets/images/low_sodium.png',
+                            getCategoryImage('Low Sodium'),
                             () => Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -170,17 +183,17 @@ class _OrderScreenState extends State<OrderScreen> {
                           ),
                           _buildCategoryCard(
                             'High Protein',
-                            'assets/images/high_protein.png',
+                            getCategoryImage('High Protein'),
                             () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => HighProteinScreen(),
+                                builder: (context) => const HighProteinScreen(),
                               ),
                             ),
                           ),
                           _buildCategoryCard(
                             'Diabetic Friendly',
-                            'assets/images/diabetic_friendly.png',
+                            getCategoryImage('Diabetic Friendly'),
                             () => Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -191,7 +204,7 @@ class _OrderScreenState extends State<OrderScreen> {
                           ),
                           _buildCategoryCard(
                             'Lactose Free',
-                            'assets/images/lactose_free.png',
+                            getCategoryImage('Lactose Free'),
                             () => Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -235,9 +248,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                   const SizedBox(height: 4),
                                   const Text(
                                     'within 20km!',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                    ),
+                                    style: TextStyle(fontSize: 14),
                                   ),
                                   const SizedBox(height: 12),
                                   ElevatedButton(
@@ -254,10 +265,12 @@ class _OrderScreenState extends State<OrderScreen> {
                                       backgroundColor: Colors.black,
                                       foregroundColor: Colors.white,
                                       padding: const EdgeInsets.symmetric(
-                                          horizontal: 20),
+                                        horizontal: 20,
+                                      ),
                                       shape: const RoundedRectangleBorder(
                                         borderRadius: BorderRadius.all(
-                                            Radius.circular(20)),
+                                          Radius.circular(20),
+                                        ),
                                       ),
                                     ),
                                     child: const Text(
@@ -404,25 +417,19 @@ class _OrderScreenState extends State<OrderScreen> {
         },
         selectedItemColor: const Color(0xFFFEEB50), // Yellow selected icon
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.history),
-            label: 'Orders',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Orders'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
     );
   }
 
   Widget _buildCategoryCard(
-      String title, String imagePath, VoidCallback onTap) {
+    String title,
+    String imagePath,
+    VoidCallback onTap,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -503,5 +510,20 @@ class _OrderScreenState extends State<OrderScreen> {
         ),
       ),
     );
+  }
+
+  String getCategoryImage(String category) {
+    switch (category) {
+      case 'Low Sodium':
+        return 'assets/low-sodium-icon.png';
+      case 'High Protein':
+        return 'assets/protein-icon.png';
+      case 'Diabetic Friendly':
+        return 'assets/diabetic-icon.png';
+      case 'Lactose Free':
+        return 'assets/lactose-icon.png';
+      default:
+        return 'assets/LOGO.png';
+    }
   }
 }

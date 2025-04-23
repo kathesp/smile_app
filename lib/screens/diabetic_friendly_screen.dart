@@ -39,8 +39,7 @@ class _DiabeticFriendlyScreenState extends State<DiabeticFriendlyScreen> {
                 description: item['description'],
                 price: item['price'],
                 category: _selectedCategory,
-                image:
-                    'assets/diabetic_friendly/${_selectedCategory.toLowerCase().replaceAll(' ', '_')}.png',
+                image: getImagePathForItem(item['name'], _selectedCategory),
                 isLowSodium: false,
                 isHighProtein: false,
                 isDiabeticFriendly: true,
@@ -50,6 +49,74 @@ class _DiabeticFriendlyScreenState extends State<DiabeticFriendlyScreen> {
                     : const [],
               ))
           .toList();
+
+  String getImagePathForItem(String itemName, String subcategory) {
+    // Direct mapping of item names to image file names
+    final Map<String, String> imageMap = {
+      // Morning Offer
+      'Lugaw with Egg': 'DF-Lugaw-Egg',
+      'Boiled Kamote or Saba with Egg': 'DF-Boiled-Kamote-Saba',
+      'Oatmeal Champorado with Tablea': 'DF-Oatmeal-Champorado',
+      'Amplaya Omelet': 'DF-Ampalaya-Omelette',
+      'Rice + Tofu + Sitaw stir-fry': 'DF-Rice-Tofu-Sitaw',
+
+      // Lunch Offer
+      'Ginisang Kalabasa with Malunggay and Tofu': 'DF-Kalabasa-Malunggay-Tofu',
+      'Grilled Fish with Ensaladang Talong': 'DF-Grilled-Fish-Talong',
+      'Sinampalukang Manok': 'DF-Sinampalukang-Manok',
+      'Chicken Tinola with Sayote': 'DF-Chicken-Tinola-Sayote',
+      'Laing with brown rice': 'DF-Laing-Brown-Rice',
+
+      // Drinks
+      'Salabat with Stevia': 'DF-Salabat-Stevia',
+      'Unsweetened Soy Milk': 'DF-Unsweetened-Soy-Milk',
+      'Pandan Tea': 'DF-Pandan-Tea',
+      'Lemongrass Water': 'DF-Lemongrass-Water',
+      'Low-sugar Buko Juice': 'DF-Low-Sugar-Buko-Juice',
+
+      // Dinner Offer
+      'Pesang Isda with Sayote and Pechay': 'DF-Pesang-Isda',
+      'Tofu and Ampalaya Stir Fry': 'DF-Tofu-Ampalaya-Stir-Fry',
+      'Mongo with Malunggay and Sliced Egg': 'DF-Mongo-Malunggay-Egg',
+      'Grilled Chicken Inasal': 'DF-Chicken-Inasal',
+      'Chopsuey with Lean Pork': 'DF-Chopsuey-Lean-Pork',
+
+      // Additional
+      'Unsweetened Oat Balls': 'DF-Oat-Balls',
+      'Boiled Corn': 'DF-Boiled-Corn',
+      'Fruit slices': 'DF-Fruit-Slices',
+      'Low-carb Pichi-Pichi': 'DF-Low-Carb-Pichi-Pichi',
+      'Boiled Peanuts': 'DF-Boiled-Peanuts',
+    };
+
+    // Exact match lookup
+    if (imageMap.containsKey(itemName)) {
+      return 'assets/Diabetic-Friendly/${imageMap[itemName]}.png';
+    }
+
+    // Try partial match if exact match not found
+    for (var key in imageMap.keys) {
+      if (itemName.contains(key) || key.contains(itemName)) {
+        return 'assets/Diabetic-Friendly/${imageMap[key]}.png';
+      }
+    }
+
+    // Fallback to category-based mapping
+    Map<String, String> categorySampleImages = {
+      'Morning Offer': 'DF-Ampalaya-Omelette',
+      'Lunch Offer': 'DF-Grilled-Fish-Talong',
+      'Drinks': 'DF-Pandan-Tea',
+      'Dinner Offer': 'DF-Pesang-Isda',
+      'Additional': 'DF-Fruit-Slices',
+    };
+
+    if (categorySampleImages.containsKey(subcategory)) {
+      return 'assets/Diabetic-Friendly/${categorySampleImages[subcategory]}.png';
+    }
+
+    // Last fallback is app logo
+    return 'assets/LOGO.png';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -219,103 +286,96 @@ class _DiabeticFriendlyScreenState extends State<DiabeticFriendlyScreen> {
           ),
         );
       },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 4,
-              offset: const Offset(0, 1),
-            ),
-          ],
-        ),
+      child: Card(
+        elevation: 2,
+        margin: EdgeInsets.zero,
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Food Image
-            ClipRRect(
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(12)),
-              child: Stack(
-                children: [
-                  Container(
-                    height: 120,
-                    width: double.infinity,
-                    color: Colors.grey.shade200,
-                    child: const Center(
-                      child: Icon(Icons.restaurant, color: Colors.grey),
-                    ),
-                  ),
-                  // Add to cart button
-                  Positioned(
-                    right: 4,
-                    bottom: 4,
-                    child: GestureDetector(
-                      onTap: () {
-                        cartService.addItem(item);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('${item.name} added to cart'),
-                            duration: const Duration(seconds: 1),
-                            action: SnackBarAction(
-                              label: 'VIEW CART',
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const CartScreen(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              spreadRadius: 1,
-                              blurRadius: 1,
-                            ),
-                          ],
-                        ),
-                        child: const Icon(Icons.add, size: 18),
+            // Food image
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                color: Colors.white,
+                child: Image.asset(
+                  item.image,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey.shade200,
+                      child: const Center(
+                        child: Icon(Icons.image_not_supported, size: 40),
                       ),
-                    ),
-                  ),
-                ],
+                    );
+                  },
+                ),
               ),
             ),
 
-            // Food details
-            Padding(
+            // Yellow bottom bar with food name, price and add button
+            Container(
+              color: const Color(0x64FF9902), // Amber/yellow color
               padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    item.name,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
+                  // Name and price
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          item.name,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          '₱${item.price.toStringAsFixed(0)}',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '₱${item.price.toStringAsFixed(0)}',
-                    style: TextStyle(
-                      color: Colors.grey.shade700,
-                      fontSize: 14,
+
+                  // Add button
+                  GestureDetector(
+                    onTap: () {
+                      cartService.addItem(item);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('${item.name} added to cart'),
+                          duration: const Duration(seconds: 1),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFD88305),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Text(
+                        'Add',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
                 ],

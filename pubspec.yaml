@@ -78,6 +78,114 @@ flutter:
     - assets/medical-support-icon.png
     - assets/order-icon.png
     - assets/ad-bg.jpg
+    - assets/diabetic-icon.png
+    - assets/lactose-icon.png
+    - assets/low-sodium-icon.png
+    - assets/protein-icon.png
+    - assets/Low-Sodium/
+    - assets/Low-Sodium/LS-Boiled-Saba.png
+    - assets/Low-Sodium/LS-Calamansi-Juice.png
+    - assets/Low-Sodium/LS-Chicken-Tinola.png
+    - assets/Low-Sodium/LS-Corn-on-Cob.png
+    - assets/Low-Sodium/LS-Cucumber-Water.png
+    - assets/Low-Sodium/LS-Ginisang-Ampalaya.png
+    - assets/Low-Sodium/LS-Ginisang-Upo.png
+    - assets/Low-Sodium/LS-Grilled-Bangus.png
+    - assets/Low-Sodium/LS-Kamote-Boiled-Eggs.png
+    - assets/Low-Sodium/LS-Kamote-Cue.png
+    - assets/Low-Sodium/LS-Laing.png
+    - assets/Low-Sodium/LS-Lugaw.png
+    - assets/Low-Sodium/LS-Lumpia-Sariwa.png
+    - assets/Low-Sodium/LS-Mongo.png
+    - assets/Low-Sodium/LS-Nilagang-Gulay.png
+    - assets/Low-Sodium/LS-Pandan-Water.png
+    - assets/Low-Sodium/LS-Pandesal.png
+    - assets/Low-Sodium/LS-Pesang-Isda.png
+    - assets/Low-Sodium/LS-Pinakbet.png
+    - assets/Low-Sodium/LS-Pineapple-Juice.png
+    - assets/Low-Sodium/LS-Saging-Saba-Oats.png
+    - assets/Low-Sodium/LS-Salabat.png
+    - assets/Low-Sodium/LS-Sayote-Giniling.png
+    - assets/Low-Sodium/LS-Steamed-Okra.png
+    - assets/Low-Sodium/LS-Tokwa-Rice.png
+    - assets/High-Protein/
+    - assets/High-Protein/HP-Tortang-Talong.png
+    - assets/High-Protein/HP-Boiled-Eggs-Kamote.png
+    - assets/High-Protein/HP-Bangus-Belly-Rice.png
+    - assets/High-Protein/HP-Tokwa-Sitaw.png
+    - assets/High-Protein/HP-Chicken Arroz Caldo.png
+    - assets/High-Protein/HP-Adobong Manok sa Pula.png
+    - assets/High-Protein/HP-Ginataang-Sitaw-Kalabasa.png
+    - assets/High-Protein/HP-Sinampalukang-Manok.png
+    - assets/High-Protein/HP-Inihaw na Tilapia + Salad.png
+    - assets/High-Protein/HP-Pork Ginisang Repolyo.png
+    - assets/High-Protein/HP-Soy-Milk.png
+    - assets/High-Protein/HP-Calamansi-Protein-Blend.png
+    - assets/High-Protein/HP-Malunggay-Smoothie.png
+    - assets/High-Protein/HP-Protein-Lugaw.png
+    - assets/High-Protein/HP-Peanut-Drink.png
+    - assets/High-Protein/HP-Chicken-Adobo.png
+    - assets/High-Protein/HP-Ginisang-Monggo.png
+    - assets/High-Protein/HP-Stir-Fried-Tofu.png #Stir-fried Tofu + Ampalaya
+    - assets/High-Protein/HP-Lumpiang-Toge.png
+    - assets/High-Protein/HP-Beef-Tapa.png
+    - assets/High-Protein/HP-Hard-Boiled-Eggs.png
+    - assets/High-Protein/HP-Tuna-Spread-Pandesal.png
+    - assets/High-Protein/HP-Protein-Bar.png
+    - assets/High-Protein/HP-Steamed-Fish-Flakes.png
+    - assets/High-Protein/HP-Boiled-Peanuts.png
+    - assets/Diabetic-Friendly/
+    - assets/Diabetic-Friendly/DF-Boiled-Corn.png
+    - assets/Diabetic-Friendly/DF-Boiled-Peanuts.png
+    - assets/Diabetic-Friendly/DF-Fruit-Slices.png
+    - assets/Diabetic-Friendly/DF-Low-Carb-Pichi-Pichi.png
+    - assets/Diabetic-Friendly/DF-Oat-Balls.png
+    - assets/Diabetic-Friendly/DF-Boiled-Kamote-Saba.png
+    - assets/Diabetic-Friendly/DF-Chicken-Inasal.png
+    - assets/Diabetic-Friendly/DF-Chopsuey-Lean-Pork.png
+    - assets/Diabetic-Friendly/DF-Mongo-Malunggay-Egg.png
+    - assets/Diabetic-Friendly/DF-Pesang-Isda.png
+    - assets/Diabetic-Friendly/DF-Tofu-Ampalaya-Stir-Fry.png
+    - assets/Diabetic-Friendly/DF-Lemongrass-Water.png
+    - assets/Diabetic-Friendly/DF-Low-Sugar-Buko-Juice.png
+    - assets/Diabetic-Friendly/DF-Pandan-Tea.png
+    - assets/Diabetic-Friendly/DF-Salabat-Stevia.png
+    - assets/Diabetic-Friendly/DF-Unsweetened-Soy-Milk.png
+    - assets/Diabetic-Friendly/DF-Chicken-Tinola-Sayote.png
+    - assets/Diabetic-Friendly/DF-Grilled-Fish-Talong.png
+    - assets/Diabetic-Friendly/DF-Kalabasa-Malunggay-Tofu.png
+    - assets/Diabetic-Friendly/DF-Laing-Brown-Rice.png
+    - assets/Diabetic-Friendly/DF-Sinampalukang-Manok.png
+    - assets/Diabetic-Friendly/DF-Ampalaya-Omelette.png
+    - assets/Diabetic-Friendly/DF-Lugaw-Egg.png
+    - assets/Diabetic-Friendly/DF-Oatmeal-Champorado.png
+    - assets/Diabetic-Friendly/DF-Rice-Tofu-Sitaw.png
+    - assets/Lactose-Free/
+    - assets/Lactose-Free/LF-Banana-Cue.png
+    - assets/Lactose-Free/LF-Boiled-Cassava.png
+    - assets/Lactose-Free/LF-Fresh-Lumpia.png
+    - assets/Lactose-Free/LF-Kalamay.png
+    - assets/Lactose-Free/LF-Rice-Cakes.png
+    - assets/Lactose-Free/LF-Adobong-Kangkong-Tofu.png
+    - assets/Lactose-Free/LF-Laing.png
+    - assets/Lactose-Free/LF-Mongo-Guisado-Malunggay.png
+    - assets/Lactose-Free/LF-Stir-Fried-Gabi-Pechay.png
+    - assets/Lactose-Free/LF-Tuna-Lumpia.png
+    - assets/Lactose-Free/LF-Almond-Milk-Brew.png
+    - assets/Lactose-Free/LF-Coconut-Water.png
+    - assets/Lactose-Free/LF-Rice-Milk-Smoothie.png
+    - assets/Lactose-Free/LF-Salabat.png
+    - assets/Lactose-Free/LF-Soy-Taho.png
+    - assets/Lactose-Free/LF-Chicken-Adobo.png
+    - assets/Lactose-Free/LF-Ginisang-Upo-Chicken.png
+    - assets/Lactose-Free/LF-Inihaw-Tilapia-Mangga.png
+    - assets/Lactose-Free/LF-Paksiw-Bangus.png
+    - assets/Lactose-Free/LF-Pork-Sinigang.png
+    - assets/Lactose-Free/LF-Arroz-Caldo.png
+    - assets/Lactose-Free/LF-Boiled-Saba-Peanut-Butter.png
+    - assets/Lactose-Free/LF-Ginisang-Ampalaya-Egg.png
+    - assets/Lactose-Free/LF-Soy-Milk-Banana.png
+    - assets/Lactose-Free/LF-Tortang-Talong.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

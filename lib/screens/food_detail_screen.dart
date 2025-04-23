@@ -90,19 +90,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                     ),
                   ],
                   flexibleSpace: FlexibleSpaceBar(
-                    background: Image.asset(
-                      widget.foodItem.image,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.grey.shade300,
-                          child: const Center(
-                            child:
-                                Icon(Icons.image, size: 50, color: Colors.grey),
-                          ),
-                        );
-                      },
-                    ),
+                    background: _buildFoodImage(widget.foodItem),
                   ),
                 ),
 
@@ -346,6 +334,143 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
         child: const Text('ADD TO CART', style: TextStyle(color: Colors.black)),
       ),
     );
+  }
+
+  Widget _buildFoodImage(FoodItem foodItem) {
+    String imagePath = foodItem.image;
+
+    // For Low Sodium items, try to load from assets/Low-Sodium directory first
+    if (foodItem.isLowSodium) {
+      // Extract the filename from the image path and try to form a direct path
+      String fileName = imagePath.split('/').last;
+
+      // If the image path doesn't start with 'LS-', try to find a matching image
+      if (!fileName.startsWith('LS-')) {
+        // Try to match the food name to an image name
+        String simplifiedName =
+            foodItem.name.split('(')[0].trim().replaceAll(' ', '-');
+        fileName = 'LS-$simplifiedName.png';
+      }
+
+      // Use the LOGO as a fallback if needed
+      return Image.asset(
+        'assets/Low-Sodium/$fileName',
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          // If the specific image fails, try the app logo
+          return Image.asset(
+            'assets/LOGO.png',
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) {
+              // Last resort fallback to a colored container with icon
+              return Container(
+                color: Colors.amber.shade100,
+                child: const Center(
+                  child: Icon(Icons.food_bank, size: 80, color: Colors.amber),
+                ),
+              );
+            },
+          );
+        },
+      );
+    } else if (foodItem.isHighProtein) {
+      // Extract the filename from the image path and try to form a direct path
+      String fileName = imagePath.split('/').last;
+
+      // If the image path doesn't start with 'HP-', try to find a matching image
+      if (!fileName.startsWith('HP-') && fileName != '4.png') {
+        // Try to match the food name to an image name based on common patterns
+        String simplifiedName = foodItem.name.split('(')[0].trim();
+
+        // Map common food names to their image filenames
+        final Map<String, String> imageMap = {
+          'Tortang Talong': 'HP-Tortang-Talong',
+          'Boiled Eggs': 'HP-Boiled-Eggs-Kamote',
+          'Bangus Belly': 'HP-Bangus-Belly-Rice',
+          'Tokwa\'t Sitaw': 'HP-Tokwa-Sitaw',
+          'Arroz Caldo': 'HP-Chicken Arroz Caldo',
+          'Adobong Manok': 'HP-Adobong Manok sa Pula',
+          'Sitaw at Kalabasa': 'HP-Ginataang-Sitaw-Kalabasa',
+          'Sinampalukang': 'HP-Sinampalukang-Manok',
+          'Tilapia': 'HP-Inihaw na Tilapia + Salad',
+          'Repolyo': 'HP-Pork Ginisang Repolyo',
+          'Soy Milk': 'HP-Soy-Milk',
+          'Whey': 'HP-Calamansi-Protein-Blend',
+          'Malunggay Smoothie': 'HP-Malunggay-Smoothie',
+          'Protein-rich lugaw': 'HP-Protein-Lugaw',
+          'Peanut': 'HP-Peanut-Drink',
+          'Chicken Adobo': 'HP-Chicken-Adobo',
+          'Monggo': 'HP-Ginisang-Monggo',
+          'Tofu and Ampalaya': 'HP-Stir-Fried-Tofu',
+          'Lumpiang Togue': 'HP-Lumpiang-Toge',
+          'Beef Tapa': 'HP-Beef-Tapa',
+          'Hard-boiled': 'HP-Hard-Boiled-Eggs',
+          'Tuna spread': 'HP-Tuna-Spread-Pandesal',
+          'Protein bar': 'HP-Protein-Bar',
+          'fish flakes': 'HP-Steamed-Fish-Flakes',
+          'Boiled peanuts': 'HP-Boiled-Peanuts',
+        };
+
+        // Try to find a matching key
+        String matchedKey = '';
+        for (var key in imageMap.keys) {
+          if (simplifiedName.contains(key)) {
+            matchedKey = key;
+            break;
+          }
+        }
+
+        fileName =
+            matchedKey.isNotEmpty ? imageMap[matchedKey]! : 'HP-Tortang-Talong';
+        if (!fileName.endsWith('.png')) {
+          fileName = '$fileName.png';
+        }
+      }
+
+      // Use the LOGO as a fallback if needed
+      return Image.asset(
+        'assets/High-Protein/$fileName',
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          // If the specific image fails, try the app logo
+          return Image.asset(
+            'assets/LOGO.png',
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) {
+              // Last resort fallback to a colored container with icon
+              return Container(
+                color: Colors.green.shade100,
+                child: const Center(
+                  child: Icon(Icons.food_bank, size: 80, color: Colors.green),
+                ),
+              );
+            },
+          );
+        },
+      );
+    } else {
+      // For other items, use the regular path with fallback
+      return Image.asset(
+        imagePath,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          // Fallback to logo
+          return Image.asset(
+            'assets/LOGO.png',
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) {
+              // Last resort fallback
+              return Container(
+                color: Colors.grey.shade300,
+                child: const Center(
+                  child: Icon(Icons.image, size: 50, color: Colors.grey),
+                ),
+              );
+            },
+          );
+        },
+      );
+    }
   }
 }
 

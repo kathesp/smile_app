@@ -227,6 +227,17 @@ Banana-cue (no caramel coating) – ₱99
       (cat) => cat.name == categoryName,
       orElse: () => DietaryCategory(categoryName, {}),
     );
-    return category.subcategories[subcategory] ?? [];
+    final items = category.subcategories[subcategory] ?? [];
+
+    // Debug print to see exactly what items are available
+    if (categoryName == 'Low Sodium') {
+      print(
+          'DEBUG MenuService - Requested items for $categoryName, $subcategory:');
+      for (var item in items) {
+        print('  - ${item['name']}');
+      }
+    }
+
+    return items;
   }
 }

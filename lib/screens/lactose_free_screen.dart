@@ -38,8 +38,7 @@ class _LactoseFreeScreenState extends State<LactoseFreeScreen> {
                 description: item['description'],
                 price: item['price'],
                 category: _selectedCategory,
-                image:
-                    'assets/lactose_free/${_selectedCategory.toLowerCase().replaceAll(' ', '_')}.png',
+                image: getImagePathForItem(item['name'], _selectedCategory),
                 isLowSodium: false,
                 isHighProtein: false,
                 isDiabeticFriendly: false,
@@ -49,6 +48,74 @@ class _LactoseFreeScreenState extends State<LactoseFreeScreen> {
                     : const [],
               ))
           .toList();
+
+  String getImagePathForItem(String itemName, String subcategory) {
+    // Direct mapping of item names to image file names
+    final Map<String, String> imageMap = {
+      // Morning Offer
+      'Arroz Caldo with Chicken and Malunggay': 'LF-Arroz-Caldo',
+      'Boiled Saba + Peanut Butter': 'LF-Boiled-Saba-Peanut-Butter',
+      'Ginisang Ampalaya with Egg': 'LF-Ginisang-Ampalaya-Egg',
+      'Tortang Talong': 'LF-Tortang-Talong',
+      'Soy Milk with Banana or Kamote': 'LF-Soy-Milk-Banana',
+
+      // Lunch Offer
+      'Chicken Adobo': 'LF-Chicken-Adobo',
+      'Inihaw na Tilapia with Ensaladang Mangga': 'LF-Inihaw-Tilapia-Mangga',
+      'Paksiw na Bangus': 'LF-Paksiw-Bangus',
+      'Ginisang Upo with Chicken': 'LF-Ginisang-Upo-Chicken',
+      'Pork Sinigang': 'LF-Pork-Sinigang',
+
+      // Drinks
+      'Soy-based Taho': 'LF-Soy-Taho',
+      'Ginger Brew': 'LF-Salabat',
+      'Rice Milk Smoothie with Mango': 'LF-Rice-Milk-Smoothie',
+      'Coconut Water': 'LF-Coconut-Water',
+      'Almond Milk Brew with Table': 'LF-Almond-Milk-Brew',
+
+      // Dinner Offer
+      'Laing': 'LF-Laing',
+      'Mongo Guisado with Malunggay': 'LF-Mongo-Guisado-Malunggay',
+      'Tuna Lumpia': 'LF-Tuna-Lumpia',
+      'Stir-fried Gabi and Pechay': 'LF-Stir-Fried-Gabi-Pechay',
+      'Adobong Kangkong with Tofu': 'LF-Adobong-Kangkong-Tofu',
+
+      // Additional
+      'Kalamay': 'LF-Kalamay',
+      'Boiled Cassava': 'LF-Boiled-Cassava',
+      'Rice Cakes': 'LF-Rice-Cakes',
+      'Fresh Lumpia': 'LF-Fresh-Lumpia',
+      'Banana-cue': 'LF-Banana-Cue',
+    };
+
+    // Exact match lookup
+    if (imageMap.containsKey(itemName)) {
+      return 'assets/Lactose-Free/${imageMap[itemName]}.png';
+    }
+
+    // Try partial match if exact match not found
+    for (var key in imageMap.keys) {
+      if (itemName.contains(key) || key.contains(itemName)) {
+        return 'assets/Lactose-Free/${imageMap[key]}.png';
+      }
+    }
+
+    // Fallback to category-based mapping
+    Map<String, String> categorySampleImages = {
+      'Morning Offer': 'LF-Arroz-Caldo',
+      'Lunch Offer': 'LF-Chicken-Adobo',
+      'Drinks': 'LF-Soy-Taho',
+      'Dinner Offer': 'LF-Laing',
+      'Additional': 'LF-Fresh-Lumpia',
+    };
+
+    if (categorySampleImages.containsKey(subcategory)) {
+      return 'assets/Lactose-Free/${categorySampleImages[subcategory]}.png';
+    }
+
+    // Last fallback is app logo
+    return 'assets/LOGO.png';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -218,103 +285,96 @@ class _LactoseFreeScreenState extends State<LactoseFreeScreen> {
           ),
         );
       },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 4,
-              offset: const Offset(0, 1),
-            ),
-          ],
-        ),
+      child: Card(
+        elevation: 2,
+        margin: EdgeInsets.zero,
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Food Image
-            ClipRRect(
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(12)),
-              child: Stack(
-                children: [
-                  Container(
-                    height: 120,
-                    width: double.infinity,
-                    color: Colors.grey.shade200,
-                    child: const Center(
-                      child: Icon(Icons.restaurant, color: Colors.grey),
-                    ),
-                  ),
-                  // Add to cart button
-                  Positioned(
-                    right: 4,
-                    bottom: 4,
-                    child: GestureDetector(
-                      onTap: () {
-                        cartService.addItem(item);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('${item.name} added to cart'),
-                            duration: const Duration(seconds: 1),
-                            action: SnackBarAction(
-                              label: 'VIEW CART',
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const CartScreen(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              spreadRadius: 1,
-                              blurRadius: 1,
-                            ),
-                          ],
-                        ),
-                        child: const Icon(Icons.add, size: 18),
+            // Food image
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                color: Colors.white,
+                child: Image.asset(
+                  item.image,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey.shade200,
+                      child: const Center(
+                        child: Icon(Icons.image_not_supported, size: 40),
                       ),
-                    ),
-                  ),
-                ],
+                    );
+                  },
+                ),
               ),
             ),
 
-            // Food details
-            Padding(
+            // Yellow bottom bar with food name, price and add button
+            Container(
+              color: const Color(0xFFDDD6F8), // Amber/yellow color
               padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    item.name,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
+                  // Name and price
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          item.name,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          '₱${item.price.toStringAsFixed(0)}',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '₱${item.price.toStringAsFixed(0)}',
-                    style: TextStyle(
-                      color: Colors.grey.shade700,
-                      fontSize: 14,
+
+                  // Add button
+                  GestureDetector(
+                    onTap: () {
+                      cartService.addItem(item);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('${item.name} added to cart'),
+                          duration: const Duration(seconds: 1),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xB5A767CC),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Text(
+                        'Add',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
                 ],

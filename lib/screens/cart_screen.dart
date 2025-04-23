@@ -98,21 +98,7 @@ class _CartScreenState extends State<CartScreen> {
                                 // Food image
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(8),
-                                  child: Image.asset(
-                                    item.foodItem.image,
-                                    width: 70,
-                                    height: 70,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Container(
-                                        width: 70,
-                                        height: 70,
-                                        color: Colors.grey.shade200,
-                                        child: const Icon(Icons.image,
-                                            color: Colors.grey),
-                                      );
-                                    },
-                                  ),
+                                  child: _buildFoodItemImage(item.foodItem),
                                 ),
                                 const SizedBox(width: 12),
 
@@ -325,6 +311,155 @@ class _CartScreenState extends State<CartScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildFoodItemImage(FoodItem foodItem) {
+    // For Low Sodium foods, try to use the image from assets/Low-Sodium directory
+    if (foodItem.isLowSodium) {
+      // Try to extract a matching filename
+      String imageName = '';
+      String simplifiedName = foodItem.name.split('(')[0].trim();
+
+      // Map of common food names to their image filenames
+      final Map<String, String> imageMap = {
+        'Lugaw': 'LS-Lugaw',
+        'Pandesal': 'LS-Pandesal',
+        'Saging na Saba': 'LS-Saging-Saba-Oats',
+        'Tofu': 'LS-Tokwa-Rice',
+        'Kamote': 'LS-Kamote-Boiled-Eggs',
+        'Bangus': 'LS-Grilled-Bangus',
+        'Pinakbet': 'LS-Pinakbet',
+        'Tinola': 'LS-Chicken-Tinola',
+        'Laing': 'LS-Laing',
+        'Mongo': 'LS-Mongo',
+        'Salabat': 'LS-Salabat',
+        'Cucumber': 'LS-Cucumber-Water',
+        'Calamansi': 'LS-Calamansi-Juice',
+        'Pandan': 'LS-Pandan-Water',
+        'Pesang': 'LS-Pesang-Isda',
+        'Upo': 'LS-Ginisang-Upo',
+        'Sayote': 'LS-Sayote-Giniling',
+        'Ampalaya': 'LS-Ginisang-Ampalaya',
+        'Nilagang': 'LS-Nilagang-Gulay',
+        'Lumpia': 'LS-Lumpia-Sariwa',
+        'Corn': 'LS-Corn-on-Cob',
+        'Saba': 'LS-Boiled-Saba',
+        'Okra': 'LS-Steamed-Okra',
+      };
+
+      // Try to find a matching key
+      for (var key in imageMap.keys) {
+        if (simplifiedName.contains(key)) {
+          imageName = imageMap[key]!;
+          break;
+        }
+      }
+
+      // If we found a match, use it
+      if (imageName.isNotEmpty) {
+        return Image.asset(
+          'assets/Low-Sodium/$imageName.png',
+          width: 70,
+          height: 70,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            // Fallback to logo
+            return Image.asset(
+              'assets/LOGO.png',
+              width: 70,
+              height: 70,
+              fit: BoxFit.contain,
+            );
+          },
+        );
+      }
+    } else if (foodItem.isHighProtein) {
+      // Try to extract a matching filename
+      String imageName = '';
+      String simplifiedName = foodItem.name.split('(')[0].trim();
+
+      // Map of common food names to their image filenames
+      final Map<String, String> imageMap = {
+        'Tortang Talong': 'HP-Tortang-Talong',
+        'Boiled Eggs': 'HP-Boiled-Eggs-Kamote',
+        'Bangus Belly': 'HP-Bangus-Belly-Rice',
+        'Tokwa\'t Sitaw': 'HP-Tokwa-Sitaw',
+        'Arroz Caldo': 'HP-Chicken Arroz Caldo',
+        'Adobong Manok': 'HP-Adobong Manok sa Pula',
+        'Ginataang Sitaw': 'HP-Ginataang-Sitaw-Kalabasa',
+        'Sinampalukang': 'HP-Sinampalukang-Manok',
+        'Tilapia': 'HP-Inihaw na Tilapia + Salad',
+        'Repolyo': 'HP-Pork Ginisang Repolyo',
+        'Soy Milk': 'HP-Soy-Milk',
+        'Whey': 'HP-Calamansi-Protein-Blend',
+        'Malunggay': 'HP-Malunggay-Smoothie',
+        'Protein-rich lugaw': 'HP-Protein-Lugaw',
+        'Peanut-based': 'HP-Peanut-Drink',
+        'Chicken Adobo': 'HP-Chicken-Adobo',
+        'Monggo': 'HP-Ginisang-Monggo',
+        'Tofu and Ampalaya': 'HP-Stir-Fried-Tofu',
+        'Lumpiang Togue': 'HP-Lumpiang-Toge',
+        'Beef Tapa': 'HP-Beef-Tapa',
+        'Hard-boiled': 'HP-Hard-Boiled-Eggs',
+        'Tuna spread': 'HP-Tuna-Spread-Pandesal',
+        'Protein bar': 'HP-Protein-Bar',
+        'fish flakes': 'HP-Steamed-Fish-Flakes',
+        'Boiled peanuts': 'HP-Boiled-Peanuts',
+      };
+
+      // Try to find a matching key
+      for (var key in imageMap.keys) {
+        if (simplifiedName.contains(key)) {
+          imageName = imageMap[key]!;
+          break;
+        }
+      }
+
+      // If we found a match, use it
+      if (imageName.isNotEmpty) {
+        return Image.asset(
+          'assets/High-Protein/$imageName.png',
+          width: 70,
+          height: 70,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            // Fallback to logo
+            return Image.asset(
+              'assets/LOGO.png',
+              width: 70,
+              height: 70,
+              fit: BoxFit.contain,
+            );
+          },
+        );
+      }
+    }
+
+    // For all other cases, try the original image path
+    return Image.asset(
+      foodItem.image,
+      width: 70,
+      height: 70,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        // If image fails, use the logo
+        return Image.asset(
+          'assets/LOGO.png',
+          width: 70,
+          height: 70,
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) {
+            // Last resort fallback
+            return Container(
+              width: 70,
+              height: 70,
+              color: Colors.grey.shade200,
+              child: const Icon(Icons.image, color: Colors.grey),
+            );
+          },
+        );
+      },
     );
   }
 }
