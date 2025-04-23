@@ -1,14 +1,35 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smile_app/services/cart_service.dart';
-import 'package:smile_app/screens/welcome_screen.dart';
 import 'package:smile_app/utils/constants.dart';
+import 'package:smile_app/screens/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  runApp(const MyApp());
+
+  try {
+    if (kIsWeb) {
+      await Firebase.initializeApp(
+        options: FirebaseOptions(
+          apiKey: "AIzaSyAk5F1RYDJKwKs9eb4oL-_Il3Aa3HXdxIU",
+          authDomain: "smile-f079e.firebaseapp.com",
+          projectId: "smile-f079e",
+          storageBucket: "smile-f079e.appspot.com",
+          messagingSenderId: "615138744374",
+          appId: "1:615138744374:web:d92457c501566346ffe097",
+        ),
+      );
+    } else {
+      await Firebase.initializeApp();
+    }
+
+    runApp(const MyApp());
+  } catch (e) {
+    print("Firebase initialization failed: $e");
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -18,7 +39,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => CartService()),
+        ChangeNotifierProvider(create: (_) => CartService()),
       ],
       child: MaterialApp(
         title: 'Smile App',
@@ -39,64 +60,8 @@ class MyApp extends StatelessWidget {
             bodyMedium: AppTextStyles.bodyText2,
             labelLarge: AppTextStyles.button,
           ),
-          inputDecorationTheme: InputDecorationTheme(
-            filled: true,
-            fillColor: Colors.grey.shade100,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: AppSizes.paddingM,
-              vertical: AppSizes.paddingM,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSizes.radiusM),
-              borderSide: BorderSide.none,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSizes.radiusM),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSizes.radiusM),
-              borderSide: const BorderSide(color: AppColors.primary, width: 2),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSizes.radiusM),
-              borderSide: const BorderSide(color: AppColors.error, width: 1),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSizes.radiusM),
-              borderSide: const BorderSide(color: AppColors.error, width: 2),
-            ),
-          ),
-          elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: AppColors.textDark,
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSizes.paddingL,
-                vertical: AppSizes.paddingM,
-              ),
-              textStyle: AppTextStyles.button,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSizes.radiusM),
-              ),
-            ),
-          ),
-          outlinedButtonTheme: OutlinedButtonThemeData(
-            style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.textDark,
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSizes.paddingL,
-                vertical: AppSizes.paddingM,
-              ),
-              textStyle: AppTextStyles.button,
-              side: const BorderSide(color: AppColors.textLight),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSizes.radiusM),
-              ),
-            ),
-          ),
         ),
-        home: const WelcomeScreen(),
+        home: const SplashScreen(),
       ),
     );
   }
